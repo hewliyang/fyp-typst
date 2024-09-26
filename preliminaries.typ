@@ -3,6 +3,15 @@
 = Preliminaries
 #lorem(60)
 
+== Flow Matching
+#lorem(120)
+
+== Autogressive/Causal Sequence Models
+#lorem(120)
+
+== Diffusion
+#lorem(120)
+
 == TTS Architectures
 #lorem(120)
 
