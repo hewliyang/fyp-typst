@@ -41,3 +41,6 @@
 
 === Self Supervised Networks
 #lorem(120)
+
+=== Survey of the latest TTS papers
+#lorem(120)

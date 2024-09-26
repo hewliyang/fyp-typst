@@ -16,9 +16,9 @@ $
   f: T -> A
 $<eq-tts-1>
 
-where $t_i$ represents individual textual units which could be characters, phonemes, words, or tokens. $a_j$ represents acousting features, which could be mel-spectograms, linear spectrograms or waveform samples.
+where $t_i$ represents individual textual units which could be characters, phonemes, words, or tokens. $a_j$ represents acoustic features, which could be mel-spectograms, linear spectrograms or waveform samples.
 
-TTS is well known as as the more challenging - inverse task of Automatic Speech Recognition (ASR). The reason for this is because TTS, or rather $f$ is a fundamentally one-to-many problem, ie. for the same input $T$, there exists many linguistically "correct" $A$'s. More explicitly, the same sentence can be expressed verbally in a large, and arguably infinite number of ways due to differences in slang, accents, style, pace, and prosody that is unique to a human speaker.
+TTS is well known as as the more challenging - inverse task of Automatic Speech Recognition (ASR). The reason for this is because TTS, or rather $f$ is a fundamentally one-to-many problem, i.e. for the same input $T$, there exists many linguistically "correct" $A$'s. More explicitly, the same sentence can be expressed verbally in a large, and arguably infinite number of ways due to differences in slang, accents, style, pace, and prosody that is unique to a human speaker.
 
 #figure(
   caption: [Factors for the one-to-many nature of TTS],
@@ -33,7 +33,7 @@ TTS is well known as as the more challenging - inverse task of Automatic Speech 
       [Prosody], [Variations in intonation, stress, rhythm],
       [Speaker Characteristics], [Voice qualities, speaking styles, accents],
       [Contextual Ambiguity], [Certain words can have multiple valid pronounciations, eg: "read" depending on present or past tense],
-      []
+      table.hline(start: 0, stroke: 1pt),
     )<tab-one-to-many>
   ],
 )

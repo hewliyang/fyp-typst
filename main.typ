@@ -1,6 +1,7 @@
 #set par(justify: true, linebreaks: auto)
 #set text(font: "New Computer Modern", size: 12pt)
 #set page(paper: "a4", margin: (x: 1in, y: 1in))
+#set figure(gap: 12pt)
 #set math.equation(numbering: "(1)", supplement: [Equation])
 #show heading: it => {
   it
