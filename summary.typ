@@ -2,14 +2,22 @@
 
 == Nature of the Project
 
-#lorem(120)
+#{
+  set align(center)
+  box(height: 32pt, width: 100%, rect([TODO]))
+}
 
 == Scope of the Project
 
-#lorem(120)
+#{
+  set align(center)
+  box(height: 32pt, width: 100%, rect([TODO]))
+}
 
 == Contributions
 
-#lorem(120)
+#{
+  set align(center)
+  box(height: 32pt, width: 100%, rect([TODO]))
+}
 
-@vaswani2023attentionneed

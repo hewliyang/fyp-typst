@@ -3,6 +3,12 @@
 = Preliminaries
 #lorem(60)
 
+== Audio Signals
+#lorem(120)
+
+== Representations for Deep Learning
+#lorem(120)
+
 == Flow Matching
 #lorem(120)
 

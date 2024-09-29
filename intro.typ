@@ -1,12 +1,23 @@
 #set heading(numbering: "1.")
 
-#import "@preview/fletcher:0.5.1" as fletcher: diagram, node, edge
-#import fletcher.shapes: diamond
-
 = Introduction
 
 == Terminology
-#lorem(120)
+
+#{
+  set align(center)
+  box(height: 32pt, width: 100%, rect([TODO]))
+}
+- Phoneme
+- Spectrogram
+- Prosody
+- Timbre
+- Tokens
+- ASR
+- TTS
+- WER
+- CER
+
 
 == Text to Speech
 
@@ -31,7 +42,7 @@ TTS is well known as as the more challenging - inverse task of Automatic Speech 
       [Factor], [Description],
       table.hline(start: 0, stroke: 1pt),
       [Prosody], [Variations in intonation, stress, rhythm],
-      [Speaker Characteristics], [Voice qualities, speaking styles, accents],
+      [Timbre & Speaker Characteristics], [Voice qualities, speaking styles, accents],
       [Contextual Ambiguity], [Certain words can have multiple valid pronounciations, eg: "read" depending on present or past tense],
       table.hline(start: 0, stroke: 1pt),
     )<tab-one-to-many>
@@ -47,13 +58,75 @@ where $A_i$ now represents the set of valid acoustic realizations.
 
 == Implications on Training Data
 
+Typically, a large amount of high quality, diverse voices is required in order to train a speech
+model that can accurately capture the various possible realizations. These datasets are notably expensive and time consuming to aquire.
+
+Notable datasets used for both training and evaluation
+
+#{
+  set align(center)
+  box(height: 32pt, width: 100%, rect([TODO]))
+}
+
+- LibriTTS (Audiobook)
+- Amphion
+
 == Implications on Evaluation Techniques
 
-== Audio Signals
-#lorem(120)
+=== Comparison to Automatic Speech Recognition (ASR)
 
-== Representations for Deep Learning
-#lorem(120)
+In ASR, evaluating a model $g$ would be as simple as formulating an objective function that quantifies the disparity between the predicted text sequence $hat(T)$ and the ground truth $T$:
+
+$
+  E_"ASR" = d(T, hat(T))
+$
+
+where $d$ is typically a string distance metric like Word Error Rate (WER) or Character Error Rate (CER).
+
+In contrast, TTS evaluations lack a straightforward objective function due to the one-to-many nature. For instance, let the set of all possible acoustic realizations be $bold(A) = {A_i}_"i=0"^k$ such that
+
+$
+  E_"TTS" = d(bold(A), hat(A))
+$
+
+where in this case, $d$ could be a the average L1 or L2 loss between the mel-spectrogram representation of each $(A_i, hat(A))$ pair, i.e. spectral loss.
+
+However, coming up with the set $bold(A)$ in the first place is intractable because $k$ is unbounded.
+
+=== Metric Dimensionality
+
+ASR primarily focuses on transcription accuracy which can be captured by a single dimensional metric. However, TTS evaluation must consider multiple dimensions. In particular:
+
+1. Intelligibility - how clear is the speech and how easy is it to understand
+2. Naturalness - how close does it sound to human speech
+3. Speaker similarity - degree of similarity of timbre compared to a reference voices in a multi-speaker system
+4. Prosody - the appropriateness of intonation, stress and rythym.
+
+=== Subjectivity
+
+WER or CER is a metric that can be computed automatically and objectively. While some objectives metrics exist for TTS such as the Mel Cepstral Distortion, they often correlate poorly with human perception (todo: find a citation). As a result, TTS evaluation relies heavily on subjective human judgements, typically in the form of Mean Opinion Scores (MOS) listening tests.
+
+These tests typically involve human evaluators to rate the perceived "quality" of a speech sample on a Likert scale ie. 1 to 5, where higher is better. The resulting metrics can then be scrutinized by paired sample t-tests to check for statistical significance that a particular system is better than another.
+
+Quality in this case can be defined by one or more dimension such as naturalness and intelligibility as mentioned above. Often, researchers tend to make different choices on which dimensions are chosen for evaluation.
+
+In addition, the experimental setup for conducting these tests also vary from formal setups, such as in an controlled labs environments to online crowdsourced efforts such as by using Amazon's Mechanical Turk. This approach is commonly used even in evaluating frontier level TTS architectures such as StyleTTS 2 @li2023styletts2humanleveltexttospeech.
+
+Often times, the latter approach is practically unavoidable due to the need for a large number of participants, time constraints and geographical constraints, such as when there is a limited number of available native speaking evaluators for a low-resource language @wells2024experimental.
+
+This variation poses a challenge as it puts the validity of such test results into scrutiny. Additionally, comparing results for the same dimension such as naturalness across tests with fundamentally different setups can be brought into question @kirkland2023stuck, @chiang2023reportdetailssubjectiveevaluation.
+
+Finally, variance in listener perception due to factors such as in @moore2013introduction:
+
+- Cultural and linguistic background
+- Attention and cognitive load
+- Environmental factors such as noise and other acoustic conditions
+- Proficiency in target languages
+- Listening devices
+
+means that for the same sample $x$, the set of ratings $hat(r)_i(x)$ where $i$ refers to the listener ID, may take any value in ${1,2,3,4,5}$. To prescribe MOS as a meaningful metric for evaluation, there is a need to ensure that the pool of listeners $n$ is large enough such that we can confidently assume the sample mean, i.e. $1/n sum_i^n hat(r_i)(x) -> r_i$ will converge to the population mean. For example, recent studies such as @wester15c_interspeech suggests a minimum of $n >= 30$ participants, including a 30 minute test coverage per participant in order to obtain statistical significant results.
+
+#pagebreak()
 
 == Motivations and Background
 
@@ -73,106 +146,6 @@ Recent advancements in deep learning has accelerated research on data-driven app
 
 The significance of reliable evaluation systems can alleviate the reliance on manual human assessments to a certain extent, but also offer an objectives means for evaluating TTS systems at scale.
 
-+ *Banana*
-  - Apple
-  - Pineapple
-
-+ Testing 123
-
-#grid(
-  columns: (1.5fr, 2fr),
-  column-gutter: 10pt,
-  [#figure(
-      caption: [An Example Table],
-      kind: table,
-      [
-        #table(
-          columns: 3,
-          [Column A],
-          [Column B],
-          [Column C],
-          table.hline(start: 0, stroke: 1pt),
-          [Hi],
-          [There],
-          [Can],
-          [You],
-          [See],
-          [This],
-          [Table],
-          [Or],
-          [Not?],
-        )
-      ],
-    )<tab-exampleTable>],
-  [#figure(
-      caption: [A Second Table],
-      kind: table,
-      [
-        #table(
-      columns: 3,
-      [*Column A*],
-      [Column B],
-      [Column C],
-      // table.hline(start: 0, stroke: 1pt),
-      [#lorem(2)],
-      [#lorem(2)],
-      [#lorem(2)],
-      [#lorem(2)],
-      [#lorem(2)],
-      [#lorem(2)],
-      [#lorem(2)],
-      [#lorem(2)],
-      [#lorem(2)],
-    )
-      ],
-    )<tab-secondTable>],
-)
-
-The results are shown in @tab-exampleTable.
-
-#figure(
-  caption: [A graph layout],
-  kind: "diagram",
-  supplement: [Figure],
-  [#diagram(
-      node-stroke: .1em,
-      node-fill: gradient.radial(blue.lighten(80%), blue, center: (30%, 20%), radius: 80%),
-      spacing: 4em,
-      edge((-1, 0), "r", "-|>", `open(path)`, label-pos: 0, label-side: center),
-      node((0, 0), `reading`, radius: 2em),
-      edge(`read()`, "-|>"),
-      node((1, 0), `eof`, radius: 2em),
-      edge(`close()`, "-|>"),
-      node((2, 0), `closed`, radius: 2em, extrude: (-2.5, 0)),
-      edge((0, 0), (0, 0), `read()`, "--|>", bend: 130deg),
-      edge((0, 0), (2, 0), `close()`, "-|>", bend: -40deg),
-    )],
-)<fig-banana>
-
-The results are shown in @fig-banana.
-
-#lorem(30)
-
-Here is an in-line equation: $f(x)=sin(x)$ #lorem(10) $g(x)=cos(x)$. #lorem(20).
-
-And here is an out of line equation
-
-$
-  f(x) = sin(x)
-$<eq-sin>
-
-$
-  g(x) = e^(3x pi)
-$<eq-exponent>
-
-$
-  h(x) = integral_0^1 tan(x) upright(d)x
-$<eq-integral>
-
-$
-  delta = sqrt(x^2 + y^2)
-$<eq-distance>
-
-Refer to @eq-distance.
+< mention MOS challenges like Blizzard and VoiceMOS >
 
 The first paper is @vaswani2023attentionneed
