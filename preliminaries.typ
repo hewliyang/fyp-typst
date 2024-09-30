@@ -36,7 +36,7 @@
 == Evaluating TTS Systems
 #lorem(120)
 
-=== Human Evaluation
+=== Subjective Evaluation
 #lorem(120)
 
 === Objective Metrics
