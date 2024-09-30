@@ -19,6 +19,8 @@
 - CER
 - MSE
 - MAE
+- Sampling Frequency $f_s$
+- dB - decibels
 
 
 == Text to Speech
@@ -63,7 +65,7 @@ where $A_i$ now represents the set of valid acoustic realizations.
 Typically, a large amount of high quality, diverse voices is required in order to train a speech
 model that can accurately capture the various possible realizations. These datasets are notably expensive and time consuming to aquire, with many requiring proprietary licensing or royalties paid to the original speakers.
 
-On the other hand, efforts by organization such as *Librivox* and volunteer readers, there are also considerable high quality, openly available text $<=>$ speech datasets suitable for both ASR and TTS under public licenses.
+On the other hand, thanks to efforts by organization such as *Librivox* volunteer readers and the research community at large, there are also considerable high quality, openly available text $<=>$ speech datasets suitable for both ASR and TTS under public licenses.
 
 #figure(
   caption: [Popular open source TTS datasets],
@@ -98,7 +100,7 @@ On the other hand, efforts by organization such as *Librivox* and volunteer read
   ],
 )<tab-tts-datasets>
 
-The advent of autogressive transformers and GPT has shined a new light on the possibilities of performance gains that comes with scaling, which the sizes of these datasets are not nearly enough for. Inspiration can be taken from large language models, which are trained on nearly all contents on the internet, and has been seen is newer datasets such as Emilia @emilia, where potentially noisy in the wild data are cleaned and annotated for training.
+The advent of autogressive transformers and GPT has shined a new light on the possibilities of performance gains that comes with scaling, which the sizes of these datasets are not nearly enough for. Inspiration can be taken from large language models, which are trained on nearly all contents on the internet, and has been seen is newer datasets such as Emilia @emilia, where potentially noisy in the wild data are cleaned and annotated for training. This phenomenon is also enabled by joint advancements in orthogonal fields such as ASR.
 
 Secondly, the datasets presented in @tab-tts-datasets also are primary English and Chinese. Availability of high quality recordings for low resource languages remain an issue.
 
