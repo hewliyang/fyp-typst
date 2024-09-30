@@ -101,7 +101,7 @@ To summarize, the result of the Analog to Digital conversion process is simply a
 == Diffusion
 #lorem(120)
 
-== TTS Architectures
+== Overview of TTS Architectures
 #lorem(120)
 
 === Tacotron 1 & 2

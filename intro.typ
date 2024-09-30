@@ -65,7 +65,7 @@ where $A_i$ now represents the set of valid acoustic realizations.
 Typically, a large amount of high quality, diverse voices is required in order to train a speech
 model that can accurately capture the various possible realizations. These datasets are notably expensive and time consuming to aquire, with many requiring proprietary licensing or royalties paid to the original speakers.
 
-On the other hand, thanks to efforts by organization such as *Librivox* volunteer readers and the research community at large, there are also considerable high quality, openly available text $<=>$ speech datasets suitable for both ASR and TTS under public licenses.
+On the other hand, thanks to efforts by organization such as *Librivox*, volunteer readers and the research community at large, there are also notable high quality, openly available text $<=>$ speech datasets suitable for both ASR and TTS under public licenses.
 
 #figure(
   caption: [Popular open source TTS datasets],
@@ -93,8 +93,8 @@ On the other hand, thanks to efforts by organization such as *Librivox* voluntee
 
       [Emilia @emilia],
       [In the wild],
-      [`en`,`zh`,`de`,`fr`,`jp`,`kr`],
-      [$approx$ 46,000hr `en`, 50,000hr `zh`, 5000hr others],
+      [`en`,`zh`,`de`,`fr`,#linebreak()`jp`,`kr`],
+      [$approx$ 46,000hr `en`#linebreak()50,000hr `zh`#linebreak() 5000hr others],
       [Yes],
     )
   ],

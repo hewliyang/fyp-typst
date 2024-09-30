@@ -7,7 +7,8 @@
   it
   v(1em)
 }
-
+#show link: set text(fill: rgb(0, 0, 255))
+#show cite: box.with(stroke: green, inset: 2pt)
 #include "front-page.typ"
 
 #pagebreak()
