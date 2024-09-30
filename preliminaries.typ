@@ -15,6 +15,13 @@ The process of converting continuous analog signals to discrete digital represen
 
 1. *Sampling*
 
+  #figure(
+    image("assets/sampling.svg", width: 100%),
+    caption: [
+      Analog to digital sampling from a 5Hz sine wave
+    ],
+  )
+
   A continuous-time signal $x(t)$ is sampled at discrete time intervals, resulting in a sequence of samples $x[n]$ where $n$ is the sample index. The sampling process can me mathematically represented as
 
   $
