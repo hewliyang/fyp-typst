@@ -84,6 +84,11 @@ The process of converting continuous analog signals to discrete digital represen
 
 To summarize, the result of the Analog to Digital conversion process is simply a 1D vector of shape $[1, t times f_s]$, where $t$ is the length of a signal in seconds with values that can be integers or floats.
 
+=== FFT
+
+=== STFT
+
+
 == Representations for Deep Learning
 #lorem(120)
 
