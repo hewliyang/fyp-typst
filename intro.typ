@@ -21,6 +21,8 @@
 - MAE
 - Sampling Frequency $f_s$
 - dB - decibels
+- FFT
+- STFT
 
 
 == Text to Speech
@@ -39,6 +41,7 @@ TTS is well known as as the more challenging - inverse task of Automatic Speech 
   caption: [Factors for the one-to-many nature of TTS],
   kind: table,
   [
+    #show table.cell.where(y: 0): strong
     #table(
       stroke: none,
       columns: 2,
@@ -100,7 +103,9 @@ On the other hand, thanks to efforts by organization such as *Librivox*, volunte
   ],
 )<tab-tts-datasets>
 
-The advent of autogressive transformers and GPT has shined a new light on the possibilities of performance gains that comes with scaling, which the sizes of these datasets are not nearly enough for. Inspiration can be taken from large language models, which are trained on nearly all contents on the internet, and has been seen is newer datasets such as Emilia @emilia, where potentially noisy in the wild data are cleaned and annotated for training. This phenomenon is also enabled by joint advancements in orthogonal fields such as ASR.
+The recent success of billion parameter large autoregressive transformer decoders has shined a new light on the possibilities of performance gains that comes with scaling, which the necessitates far larger datasets. Inspiration can be taken from these large language models, which are trained on nearly all contents on the internet.
+
+Datasets of this class have been begining to emerge, such as Emilia @emilia, where noisy data found in the wild (arbitrary sources on the web) are cleaned and annotated for training. The authors released a roughly 100 thousand hour dataset, along with the pipeline used to pre-process the data. This shows that progress in TTS is jointly accelerated by advancements in orthogonal fields such as ASR.
 
 Secondly, the datasets presented in @tab-tts-datasets also are primary English and Chinese. Availability of high quality recordings for low resource languages remain an issue.
 
