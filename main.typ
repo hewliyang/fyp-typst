@@ -10,53 +10,54 @@
 #show link: box.with(stroke: 1pt + blue, outset: (bottom: 1.5pt, x: .5pt, y: .5pt))
 #show cite: box.with(stroke: 1pt + green, outset: (bottom: 1.5pt, x: .5pt, y: .5pt))
 #show ref: box.with(stroke: 1pt + red, outset: (bottom: 1.5pt, x: .5pt, y: .5pt))
+#let newPage = pagebreak
 
 #include "front-page.typ"
 
-#pagebreak()
+#newPage()
 
-#outline(title: "Table of Contents", depth: 3, indent: true)
+#outline(title: "Table of Contents", depth: 999, indent: true)
 
-#pagebreak()
+#newPage()
 
 #include "summary.typ"
 
-#pagebreak()
+#newPage()
 
 #include "abstract.typ"
 
-#pagebreak()
+#newPage()
 
 #set page(numbering: "1", header: align(right)[Evaluating Synthetic Speech])
 
 #include "intro.typ"
 
-#pagebreak()
+#newPage()
 
 #include "preliminaries.typ"
 
-#pagebreak()
+#newPage()
 
 #include "related-work.typ"
 
-#pagebreak()
+#newPage()
 #include "dataset-curation.typ"
 
-#pagebreak()
+#newPage()
 
 #include "ablations.typ"
 
-#pagebreak()
+#newPage()
 
 #include "conclusion.typ"
-#pagebreak()
+#newPage()
 
 #bibliography("references.bib", style: "springer-basic-author-date")
 
-#pagebreak()
+#newPage()
 
 #outline(title: "Tables", target: figure.where(kind: table))
 
-#pagebreak()
+#newPage()
 
 #outline(title: "Images", target: figure.where(kind: image))

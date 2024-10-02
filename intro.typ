@@ -25,7 +25,7 @@
 - STFT
 - CNN
 - Vocoder
-
+- Codec
 
 == Text to Speech
 

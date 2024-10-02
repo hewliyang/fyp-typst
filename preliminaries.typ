@@ -184,7 +184,7 @@ where the first dimension corresponds to the frequency bins while the second cor
 
 @image-linear-spectrogram-speech and @image-linear-spectrogram-instrument illustrates the interpretable nature of spectrograms, as the difference between human speech and music instruments can be easily differentiated compared to more primitive forms such as the discrete waveform.
 
-== Representations for Deep Learning
+== Representations of Discrete Audio Signals
 
 In deep learning for audio processing, the choice of input representation can signifcantly impact model performance and efficiency. In @section-stft, we have explored a method of representing raw discrete waveforms as spectrograms using the STFT.
 
@@ -231,7 +231,7 @@ where $M$ is the transformation matrix and $x$ is the discrete input signal.
   [#image("assets/mel-filter-banks.svg", height: 200pt)],
 ) <image-mel-filterbanks>
 
-The operation in @eqn-mel-transform can be thought of as multiple 1D convolutions on the linear spectrogram, where each filter bank represented by the different colors corresponds to one convolution kernel.
+The operation in @eqn-mel-transform can be thought of as multiple 1D convolutions on the linear spectrogram, where each filter bank represented by the different colors corresponds to one convolution kernel. Equivalently, each kernel would be represented as a row of the transformation matrix $M$.
 
 Let us denote the number of filter banks or the number of bands as $n_"mels"$. Also recall @eq-spectrogram-shape. The resulting shape of the mel spectrogram is now:
 
@@ -251,13 +251,85 @@ Also recall @image-linear-spectrogram-instrument. Applying the mel-scale transfo
   [#image("assets/mel-spectrogram.svg")],
 )
 
-=== MFCC
+=== Mel Frequency Cepstral Coefficients (MFCC)
+
+MFCCs are a compact representation of the spectral envelope of a signal and is also widely used in speech and music processing tasks. MFCCs build upon the mel spectrogram representation, applying additional transformations in order to capture the most salient features of the signal.
+
+The process of computing MFCCs involves:
+1. Applying the Discrete Cosine Transform (DCT) to the log mel spectrogram
+2. Keep only the first N coefficients, which is typically 13-20 for speech applications
+
+$
+  "MFCC" = "DCT"("S"_"mel")[:N]
+$
+
+The DCT can be thought of as a way to seperate the overall shape of the spectrum which is captured by lower order coefficients from the fine details, which are captured by the higher order coefficients.
+
+In the context of evaluation, MFCCs can be used to compute the Mel Cepstral Distortion metric (MCD), which is a pairwise metric measuring the spectral difference between two signals. Concretely,
+
+$
+  "MCD" = (10 / ln(10)) sqrt(2 sum_(n=1)^N (c_n - c'_n)^2)
+$
+
+where $c_n$ and $c'_n$ are the $n^("th")$ coefficients of the natural and synthesized speech respectively. The lower the MCD, the higher their spectral similarity.
 
 === Discrete Audio Tokens
-banana
 
-== Overview of TTS Architectures
-#lorem(120)
+Taking a language modelling approach for speech generation was first introduced in Tortoise @betker2023betterspeechsynthesisscaling, who indentified the opportunity to leverage the same recipe detailed in the original DALLE-1 paper by @ramesh2021zeroshottexttoimagegeneration.
+
+More specifically, Betker firstly trained a VQVAE to learn latent, discrete representations of speech signals via a mel spectrogram reconstruction loss, producing an intermediate representation which he described as MEL tokens.
+
+==== VQVAE
+
+The VQVAE architecture consists of three main components which are analogous to the original paper by @oord2018neuraldiscreterepresentationlearning:
+
+#figure(
+  caption: "Original figure describing VQ-VAE from 2017 DeepMind paper altered with inputs as spectrograms instead of images",
+  kind: image,
+  [#image("assets/vqvae.png")],
+)
+
+1. An encoder that maps the input signal (mel spectrogram) to a latest space
+2. A vector quantization layer that discretizes the continuous latent representations using *codebooks*.
+3. A decoder that reconstructs the audio from the quantized representations.
+
+A codebook is a finite set of learned vector embeddings. During the forward pass, each latent vector produced by the encoder is replaced by it's nearest neighbour in the codebook, i.e. for an input latent $z_(e(x)) in RR^n$ produced by the encoder network:
+
+$
+  q(z_e (x)) = op("arg min", limits: #true)_(k) ||z_e (x) - e_k||_2
+$
+
+where $e_k in RR^n$ are the codebook entries, $n$ is the embedding dimension of the codes, while $k$ is the codebook size. A larger codebook allows for finer representation of the audio signal but increases computational complexity. For completeness, it is worth to note that in @betker2023betterspeechsynthesisscaling,
+
+- $k = 8192$
+- $n = 256$
+
+
+==== Autoregressive Prior
+
+Secondly, an autoregressive decoder, specifically GPT-2 @radford2019language was trained using the next token prediction objective on these MEL tokens conditioned on text token labels.
+
+$
+  P(x_1, ..., x_T | y_1, ..., y_Q) = product_(t=1)^T P(x_t | x_1, ..., x_(t-1), y_1, ... y_Q)
+$
+
+During inference, regular text tokens $y_i$ are passed to the AR decoder as inputs, and MEL tokens $x_i$ are sampled as outputs before being passed to the decoder and subsequently vocoder to be transformed into an audible waveform.
+
+This approach allows the model to generate each token conditioned on all previously generated tokens, capturing long-range dependencies in the audio signal. Indeed, the benchmarks indicate superior consistency and prosody and cadence compared to non-autoregressive models such as VITS.
+
+Since then, there has been no shortage of similar systems such as AudioLM @borsos2023audiolmlanguagemodelingapproach, Base TTS @łajszczak2024basettslessonsbuilding, VALL-E @wang2023neuralcodeclanguagemodels, and XTTS by @casanova2024xttsmassivelymultilingualzeroshot which each has tricks of it's own but operates on the same foundations.
+
+The mental model of such models are simple and proven to work at scale from the adjacent field of language modelling, but suffer from runtime & compute penalties due to the need for autoregressive decoding. Namely, it is slow and memory requirements scale with the input length at both training and inference time.
+
+Additionally, recent discrete neural audio codecs such as Encodec @défossez2022highfidelityneuralaudio have shown state of the art results in the audio compression-decompression space even in the out of domain cases by employing the same latent space quantization techniques. In fact, the codes generated by these models can be used off the shelf as audio tokens directly for causal modelling which is demonstrated by @wang2023neuralcodeclanguagemodels in VALL-E. This is to say, the weights of the codec model can be frozen during training.
+
+#figure(
+  caption: "Architecture of VALL-E",
+  kind: image,
+  [#image("assets/vall-e.png")],
+)
+
+At the same time, no bespoke decoder or vocoder networks is required to invert the tokens back to a waveform. Simply passing the sampled codes back into the frozen Encodec decoder reconstructs the waveform.
 
 == Evaluating TTS Systems
 #lorem(120)
