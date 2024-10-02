@@ -7,9 +7,10 @@
   it
   v(1em)
 }
-#show link: set text(fill: rgb(0, 0, 255))
-#show cite: box.with(stroke: green, inset: 2pt)
-#show ref: set text(fill: rgb("#09570e"))
+#show link: box.with(stroke: 1pt + blue, outset: (bottom: 1.5pt, x: .5pt, y: .5pt))
+#show cite: box.with(stroke: 1pt + green, outset: (bottom: 1.5pt, x: .5pt, y: .5pt))
+#show ref: box.with(stroke: 1pt + red, outset: (bottom: 1.5pt, x: .5pt, y: .5pt))
+
 #include "front-page.typ"
 
 #pagebreak()

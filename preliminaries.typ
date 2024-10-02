@@ -86,7 +86,7 @@ To summarize, the result of the Analog to Digital conversion process is simply a
 
 === Fourier Transform
 
-The *Continuous Fourier Transform (CFT)* is used to decompose a continuous signal such as an audio signal into its constituent frequencies. It is defined as:
+The *Fourier Transform* is used to decompose a continuous signal such as an audio signal into its constituent frequencies. It is defined as:
 
 $
   X(f) = integral_(-infinity)^infinity x(t) exp{-i 2 pi} upright(d)t
@@ -99,7 +99,7 @@ Where:
 - $x(t)$ is the input signal in the time domain (amplitude vs time)
 - $X(f)$ is the complex valued frequency domain representation of the signal (amplitude vs frequency)
 
-In audio processing, the frequency domain representation of audio signals are often more informative compared to it's time domain counterpart for identifying types of sounds in a signal.
+In audio processing, the frequency domain representation of audio signals is often more informative compared to it's time domain counterpart for identifying types of sounds in a signal.
 
 As we have established above, in digital signal processing we work with *discrete* signals. Similarly, the *Discrete Fourier Transform (DFT)* is defined as:
 
@@ -166,7 +166,7 @@ The resulting vector or tensor, i.e. the linear spectrogram takes the shape
 
 $
   ["n_fft" / 2 + 1, floor((T dot f_s - "n_fft") / "hop_length") + 1]
-$
+$ <eq-spectrogram-shape>
 
 where the first dimension corresponds to the frequency bins while the second correspond to the time frames. The magnitude of each element in the spectrogram i.e. `spectrogram[t][f]` corresponds to the amplitude of the frequency $f$ at time $t$.
 
@@ -182,34 +182,80 @@ where the first dimension corresponds to the frequency bins while the second cor
   [#image("assets/linear-spectrogram-trumpet.svg")],
 ) <image-linear-spectrogram-instrument>
 
-@image-linear-spectrogram-speech shows the STFT of a 10 second speech sample from the LibriSpeech dataset while @image-linear-spectrogram-instrument shows the STFT of a clip of a trumpet, illustrating the feature rich representation that a spectrogram can provide.
+@image-linear-spectrogram-speech and @image-linear-spectrogram-instrument illustrates the interpretable nature of spectrograms, as the difference between human speech and music instruments can be easily differentiated compared to more primitive forms such as the discrete waveform.
 
 == Representations for Deep Learning
 
-In @section-stft, we have explored a method of representing raw discrete waveforms
+In deep learning for audio processing, the choice of input representation can signifcantly impact model performance and efficiency. In @section-stft, we have explored a method of representing raw discrete waveforms as spectrograms using the STFT.
 
-== Flow Matching
-#lorem(120)
+Indeed, this is a valid format for further processing by battle tested techniques from adjacent fields such as Convolutional Neural Networks (CNN) in computer vision. In addition, as the STFT is a non-lossy operation, enabling the resulting spectrogram can be easily inverted via the inverse STFT back to a waveform, without requiring the use of a vocoder.
 
-== Autogressive/Causal Sequence Models
-#lorem(120)
+However, in practice, both raw waveforms and linear spectrograms are rarely used for tasks such as TTS due to
+1. High dimensionality on the frequency scale - requires more compute and memory for processing
+2. Perceptual misalignment with the human auditory system - humans are more perceptive to differences lower frequencies compared to higher frequencies.
 
-== Diffusion
-#lorem(120)
+Mel-spectrograms address both of these issues, but it's transformaton operation is lossy and hence requires the use of a vocoder to invert the mel-spectrogram back into an audible waveform. Despite this, they are widely used across many of the earlier prominent works such as Tacotron @wang2017tacotronendtoendspeechsynthesis. VITS @kim2021conditionalvariationalautoencoderadversarial utilises both linear spectrograms as input to a posterior encoder, but uses mel-spectrograms for computing the reconstruction loss during training.
+
+WaveNet @oord2016wavenetgenerativemodelraw and achieved success utilizing raw waveforms while modern language model inspired causal decoders such as @betker2023betterspeechsynthesisscaling rely on discrete audio tokens, which are learnt representations from Discrete Variational Auto Encoders (DVAE).
+
+=== Mel Spectrograms
+
+Mel spectrograms are a popular representation that captures both time and frequency information, tailored to human auditory perception. The difference between a linear spectrogram and mel spectrograms are simply a projection of the frequency dimension onto the mel scale.
+
+The mel scale is designed to better represent how humans perceive frequency differences. Chiefly:
+
+- Humans are more sensitive to small changes in pitch at lower frequencies than at higher frequencies.
+- THe mel scale is approximately linear below 1000Hz and logarithmic above 1000Hz.
+
+The conversion from Hz to mel is given by:
+
+$
+  m = 2595 log_10 (1 + f / 700)
+$
+
+where $m$ is the mel scale value and $f$ is the frequency in Hz.
+
+Transforming a discrete waveform into a mel-spectrogram entails largely the same recipe as the STFT, with a few extra steps which are applying a mel filterbank, then logarithmic scaling.
+
+Mathematically,
+
+$
+  "S"_"mel" = log(M dot.c abs("STFT(x)")^2)
+$ <eqn-mel-transform>
+
+where $M$ is the transformation matrix and $x$ is the discrete input signal.
+
+#figure(
+  caption: "Visualization of triangular mel filter banks",
+  kind: image,
+  [#image("assets/mel-filter-banks.svg", height: 200pt)],
+) <image-mel-filterbanks>
+
+The operation in @eqn-mel-transform can be thought of as multiple 1D convolutions on the linear spectrogram, where each filter bank represented by the different colors corresponds to one convolution kernel.
+
+Let us denote the number of filter banks or the number of bands as $n_"mels"$. Also recall @eq-spectrogram-shape. The resulting shape of the mel spectrogram is now:
+
+$
+  [n_"mels", floor((T dot f_s - "n_fft") / "hop_length") + 1]
+$
+
+such that the frequency spectrum has been quantized to a chosen $n_"mels"$.
+
+The choice of $n_"mels"$ is depends on the use case. For example both @wang2017tacotronendtoendspeechsynthesis and @kim2021conditionalvariationalautoencoderadversarial both choose a value of 80 bands.
+
+Also recall @image-linear-spectrogram-instrument. Applying the mel-scale transform with $n_"mels"=128$, we get
+
+#figure(
+  caption: [Mel scale spectrogram of @image-linear-spectrogram-instrument],
+  kind: image,
+  [#image("assets/mel-spectrogram.svg")],
+)
+
+#pagebreak()
+
+=== Discrete Tokens
 
 == Overview of TTS Architectures
-#lorem(120)
-
-=== Tacotron 1 & 2
-#lorem(120)
-
-=== Speech T5
-#lorem(120)
-
-=== VITS
-#lorem(120)
-
-=== Tortoise TTS
 #lorem(120)
 
 == Evaluating TTS Systems

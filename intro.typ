@@ -23,6 +23,8 @@
 - dB - decibels
 - FFT
 - STFT
+- CNN
+- Vocoder
 
 
 == Text to Speech
