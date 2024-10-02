@@ -60,7 +60,3 @@
 #pagebreak()
 
 #outline(title: "Images", target: figure.where(kind: image))
-
-#pagebreak()
-
-#outline(title: "Diagrams", target: figure.where(kind: "diagram"))

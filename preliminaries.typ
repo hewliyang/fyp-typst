@@ -241,7 +241,7 @@ $
 
 such that the frequency spectrum has been quantized to a chosen $n_"mels"$.
 
-The choice of $n_"mels"$ is depends on the use case. For example both @wang2017tacotronendtoendspeechsynthesis and @kim2021conditionalvariationalautoencoderadversarial both choose a value of 80 bands.
+The choice of $n_"mels"$ is depends on the use case. For example both @wang2017tacotronendtoendspeechsynthesis and @kim2021conditionalvariationalautoencoderadversarial both choose a value of 80 bands for training Tacotron and VITS respectively.
 
 Also recall @image-linear-spectrogram-instrument. Applying the mel-scale transform with $n_"mels"=128$, we get
 
@@ -251,7 +251,7 @@ Also recall @image-linear-spectrogram-instrument. Applying the mel-scale transfo
   [#image("assets/mel-spectrogram.svg")],
 )
 
-#pagebreak()
+=== MFCC
 
 === Discrete Audio Tokens
 banana
