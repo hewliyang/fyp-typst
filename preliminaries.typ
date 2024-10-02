@@ -196,7 +196,7 @@ However, in practice, both raw waveforms and linear spectrograms are rarely used
 
 Mel-spectrograms address both of these issues, but it's transformaton operation is lossy and hence requires the use of a vocoder to invert the mel-spectrogram back into an audible waveform. Despite this, they are widely used across many of the earlier prominent works such as Tacotron @wang2017tacotronendtoendspeechsynthesis. VITS @kim2021conditionalvariationalautoencoderadversarial utilises both linear spectrograms as input to a posterior encoder, but uses mel-spectrograms for computing the reconstruction loss during training.
 
-WaveNet @oord2016wavenetgenerativemodelraw and achieved success utilizing raw waveforms while modern language model inspired causal decoders such as @betker2023betterspeechsynthesisscaling rely on discrete audio tokens, which are learnt representations from Discrete Variational Auto Encoders (DVAE).
+WaveNet @oord2016wavenetgenerativemodelraw and achieved success utilizing raw waveforms while modern language model inspired causal decoders such as @betker2023betterspeechsynthesisscaling rely on discrete audio tokens, which are learnt representations from a VQVAE.
 
 === Mel Spectrograms
 
@@ -253,7 +253,8 @@ Also recall @image-linear-spectrogram-instrument. Applying the mel-scale transfo
 
 #pagebreak()
 
-=== Discrete Tokens
+=== Discrete Audio Tokens
+banana
 
 == Overview of TTS Architectures
 #lorem(120)
