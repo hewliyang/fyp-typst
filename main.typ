@@ -49,6 +49,10 @@
 
 #newPage()
 
+#include "self-supervised.typ"
+
+#newPage()
+
 #include "conclusion.typ"
 #newPage()
 
