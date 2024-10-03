@@ -400,7 +400,7 @@ where $r_i$ is the rating provided by the $i^"th"$ listener and $N$ is the total
     )],
 )
 
-MOS can be used to evaluate multiple dimensions of speech and not just naturalness including intelligibility, speaker similarity, typically denoted by subscripting as $"MOS"_"sim"$ for example.
+MOS can be used to evaluate multiple dimensions of speech and not just naturalness including intelligibility, speaker similarity, typically denoted by adding a prefix or suffix such as $"S-MOS"$ or $"MOS-N"$ for example.
 
 ==== Multiple Stimuli Hidden Reference and Anchor (MUSHRA)
 
@@ -446,7 +446,9 @@ $
 )
 $
 
-An example of such as system is #link("https://huggingface.co/spaces/TTS-AGI/TTS-Arena")[TTS Arena] @tts-arena by HuggingFace, where members of the public are prompted to do pairwise comparisons on naturalness.
+An example of such as system is #link("https://huggingface.co/spaces/TTS-AGI/TTS-Arena")[TTS Arena] @tts-arena hosted on the HuggingFace platform, where members of the public are prompted to do pairwise comparisons based on naturalness of the randomly generated samples.
+
+As of the time of writing, $binom(14,2)$ possible combinations of systems are available for comparison including proprietary systems like ElevenLabs.
 
 
 === Objective Metrics
