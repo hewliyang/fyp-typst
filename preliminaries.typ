@@ -326,25 +326,300 @@ Additionally, recent discrete neural audio codecs such as Encodec @défossez2022
 #figure(
   caption: "Architecture of VALL-E",
   kind: image,
-  [#image("assets/vall-e.png")],
+  [#image("assets/vall-e.png", height: 200pt)],
 )
 
 At the same time, no bespoke decoder or vocoder networks is required to invert the tokens back to a waveform. Simply passing the sampled codes back into the frozen Encodec decoder reconstructs the waveform.
 
+On the other hand, systems such as VALL-E suffer from content inaccuracies and high word error rates (WER). This phenomenon is in part, due to the fact that acoustic codecs are designed primarily for audio compression and the latents prioritize capturing acoustic fidelity over semantic richness as suggested by @ye2024codecdoesmatterexploring. The authors demonstrated that self-supervised features, such as those extracted by HuBERT @hsu2021hubertselfsupervisedspeechrepresentation can augment the codec latents with a richer semantic representation, leading to better performance.
+
 == Evaluating TTS Systems
-#lorem(120)
+
+TTS systems are judged by their ability to produce accurate, natural-sounding and intelligible speech. These systems can be assessed using both subjective and objective methods.
+
+Studies have shown however that objective metrics tend to not correlate well @vasilijevic2011perceptual with human perception, which necessitates the need for subjective, listening tests typically using volunteers (paid or unpaid).
+
+Subjective tests require a human in the loop, meaning it is time-consuming, error prone and expensive. It is also not feasible to scale evaluation efforts for multi-system use cases. Additionally, it cannot be used during training to validate the real-time performance of systems while training @TTS-scores.
+
+=== Absolute vs Relative Evaluations
+
+*Absolute* evaluations, or reference-free evaluations access the performance of a TTS system on a fixed scale, independent of other systems or comparisons. They provide a direct evaluation of the model's quality, usually on predefined scales. They are used when evaluating systems in isolation, and when comparisons are not possible.
+
+Examples of absolute evaluations include
+
+- Mean Opinion Scores (MOS)
+- Multiple Stimuli with Hidden Reference and Anchor (MUSHRA)
+- Mel-Cepstral Distortion (MCD)
+- Word Error Rate (WER)
+
+These metrics are easy to interpret and are a direct measurement of performance, but can be influenced by listeners bias.
+
+*Relative* evaluations compare the performance of one TTS system against the ground truths, i.e. a held-out test set or against other systems, focusing on preference and ranking rather than independent scores. It is used when the goal is to determine which system is better in a pairwise or multi-system comparison.
+
+Common relative evaluations in TTS include:
+
+- ABX tests: double blind trials to determine a perceptible difference between two signals
+- Preference tests: participants are asked to compare samples $> 2$ samples and choose the highest performing sample (such as most natural) without any explicit scoring
+- Spectral reconstruction error/loss: where $k=1$ corresponds to Mean Absolute Error (MAE) and $k=2$ corresponds to Mean Squared Error.
+
+$
+  L_"recon" = "MAE" = ||x_"mel" - hat(x)_"mel"||_k
+$
+
+A holistic evaluation set up typically uses a combination of subjective and objective metrics in order to provide a comprehensive understanding of the system's performance.
 
 === Subjective Evaluation
-#lorem(120)
+
+Subjective Evaluation involves human listeners assessing the quality of synthesized speech. These evaluations can focus on attributes such as naturalness, intelligibility or preference.
+
+==== Mean Opinion Score (MOS)
+
+MOS is a widely-used subjective metric where human listeners rate the quality of speech on a fixed Likert scale, typically from 1 to 5 where 1 is "bad" and 5 is "excellent". MOS is actually a subset of a classification of Absolute Category Rating (ACR) tests used historically in the telecommunications industry for assessing transmission quality @5946971.
+
+Recommended experimental setups are inscribed in the ITU-T P.800 standard @ITU1996.
+
+The MOS is computed as the average of all ratings.
+
+$
+  "MOS" = 1 / N sum_(i=1)^N r_i
+$
+
+where $r_i$ is the rating provided by the $i^"th"$ listener and $N$ is the total number of listeners.
+
+#figure(
+  caption: "Example of a MOS scoring rubric for naturalness",
+  kind: table,
+  [#table(
+      columns: 2,
+      [Rating], [Quality],
+      [5], [Excellent],
+      [4], [Good],
+      [3], [Fair],
+      [2], [Poor],
+      [1], [Bad],
+    )],
+)
+
+MOS can be used to evaluate multiple dimensions of speech and not just naturalness including intelligibility, speaker similarity, typically denoted by subscripting as $"MOS"_"sim"$ for example.
+
+==== Multiple Stimuli Hidden Reference and Anchor (MUSHRA)
+
+MUSHRA is a more rigorous subjective testing methodology compared to MOS, which also originates from evaluating lossy-compression in the telecommunications industry, described by ITU-R BS.1534-1 @itu_bs1534-3_2015. Listeners are presented with multiple stimuli, including a hidden reference and low quality anchor, and are instead asked to rate samples on a more fine-grained scale from 0 to 100.
+
+In the context of TTS evaluations, the lower and upper anchor references are typically not used in order to save costs, while achieving a higher overall listening time per test such as in BASE TTS @łajszczak2024basettslessonsbuilding.
+
+==== Analysis for statistical significance
+
+Firstly, both MOS and MUSHRA requires careful execution of the experimental setup in order to ensure statistically significant results.
+
+As recruiting a large number of volunteers in reality can be costly and time consuming, works such as @5946971 introduce toolkits for conducting such tests on crowdsourcing platforms such as Amazon's Mechanical Turk platform.
+
+Secondly, the relevant statistical tests must be done after conducting said listenings tests. Typically, the Students t-test is applicable when comparing pairwise systems such as synthesized vs ground-truth or ANOVA for multi-system comparisons.
+
+Correlation metrics such as Pearsons correlation coefficient (PCC) or Spearman's rank correlation coefficient (SPCC) are also typically computed to measure the perceived correlation compared to ground truths.
+
+When reporting MOS and MUSHRA, it is also standard practice to report a confidence interval, i.e. $hat(u) plus.minus t sqrt("var"(hat(u))) $, where $hat(u)$ is the observed metric and $t$ is the correct percentile from the t-distribution.
+
+==== ELO
+
+The ELO rating system, originating from chess can be adapted for pairwise comparisons in TTS evaluation. In this context, listeners compare pairs of speech outputs, and systems receive ELO ratings based on the outcome of these comparisons.
+
+In particular, assume a system $A$ with rating $E_A$ competes against system $B$ with rating $E_B$. Then, the expected score for system A is:
+
+$
+  E_A = 1 / (1 + 10^((E_B-E_A) / 400) )
+$
+
+If system $A$ wins, it's new rating is:
+
+$
+  R'_A = R_A + K * (S_A-E_A)
+$
+
+where
+
+$
+  S_A := cases(
+  1 wide& "A wins",
+  0.5 wide& "draw",
+  0 wide& "otherwise",
+)
+$
+
+An example of such as system is #link("https://huggingface.co/spaces/TTS-AGI/TTS-Arena")[TTS Arena] @tts-arena by HuggingFace, where members of the public are prompted to do pairwise comparisons on naturalness.
+
 
 === Objective Metrics
-#lorem(120)
 
-=== Predictor Networks
-#lorem(120)
+Objective metrics rely on automated methods to evaluate TTS systems. These metrics compare are mainly reference dependent, comparing synthesized speech against a ground truth.
 
-=== Self Supervised Networks
-#lorem(120)
+==== Word Error Rate (WER)
+
+WER is a common objective metric to evaluate the intelligibility of synthesized speech by measuring how well an ASR system transcribes it.
+
+Mathematically, it is defined as:
+$
+  "WER" = (S + D + I) / N
+$
+
+Where:
+
+- $S$ is the number of substitutions
+- $D$ is the number of deletions,
+- $I$ is the number of insertions
+- $N$ is the total number of words in the reference transcript
+
+WER is widely used due to it's simplicity, and the exceptional quality of recent ASR models like Whisper @radford2022robustspeechrecognitionlargescale.
+
+==== Character Error Rate (CER)
+
+CER is defined identically to WER, except at the character level instead of the world level. It is used when detecting small mistakes, particularly in languages with complex orthographies are critical.
+
+==== Signal-to-Noise Ratio (SNR)
+
+SNR is a basic metric that measures the ratio between the desired speech signal and background noise. Higher SNR indicates clearer and more intelligible speech. SNR can be used to identify generated noise in synthetic speech.
+
+The SNR is computed as
+
+$
+  "SNR" = 10log_(10) (P_"signal" / P_"noise")
+$
+
+where $P$ represents power of the speech and noise signal respectively.
+
+==== Perceptual Evaluation of Speech Quality (PESQ)
+
+PESQ attempts to predict the quality of speech as perceived by human listeners, i.e. tries to mimic MOS. It compares synthesized speech with a reference signal and evaluates the perceptual quality and was standarzied in ITU-T P.862 @itu_pesq_p862_2001.
+
+PESQ is a model-based metric, but does not actually have any learnable parameters and hence is still considered an objective metric. However, it is important to note that PESQ was originally designed to measure degradations in telecommunication transmissions, and hence may not generalize well for TTS prediction tasks.
+
+The metric ranges from -0.5 to 4.5. A Python implementation of PESQ is made available by @miao_wang_2022_6549559.
+
+==== Short-Term Objective Intelligibility (STOI)
+
+STOI is yet another object measure used to predict the intelligibility of speech in noisy environments. It compares short-term temporal envelopes of the synthesized and reference speech signals, and provides a score between 0 and 1. A higher STOI indicates higher intelligibility.
+
+$
+  "STOI" = 1 / K sum_(k=1)^K "corr"(x_k,y_k)
+$
+
+where $x_k$ and $y_k$ are the time frames of the reference and synthesized signals respectively.
 
 === Survey of the latest TTS papers
-#lorem(120)
+
+For completeness, the following table enumerates the different types of metrics used in leading TTS architectures by their respective authors, showing the variance in testing rigour across the field.
+
+#show figure: set block(breakable: true)
+
+#figure(
+  caption: [Evaluation Metrics Across TTS Systems],
+  kind: table,
+  [
+    #set text(size: 10pt)
+    #show table.cell.where(y: 0): strong
+    #table(
+      columns: 3,
+      stroke: 0.5pt,
+      [System], [Metric], [Description],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [FastSpeech 2],
+      ),
+      [Mean Opinion Score (MOS)],
+      [Overall quality assessment of synthesized speech compared to ground truth],
+
+      table.cell(
+        stroke: (bottom: 0pt),
+        [@ren2022fastspeech2fasthighquality],
+      ), [Comparative MOS (CMOS)], [Relative naturalness comparison with other systems],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [],
+      ),
+      [Statistical Measures (σ, γ, K)],
+      [Analysis of pitch accuracy using standard deviation, skewness, and kurtosis],
+
+      [], [DTW Distance], [Similarity measurement between synthesized and ground truth pitch contours],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [StyleTTS 2],
+      ), [MOS-N], [Assessment of speech naturalness/human-likeness],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [@li2023styletts2humanleveltexttospeech],
+      ), [MOS-S], [Similarity evaluation for multi-speaker models],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [],
+      ), [CMOS-N], [Comparative naturalness assessment between different configurations],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [],
+      ), [MCD & MCD-SL], [Mel-cepstral distortion measurement, with and without speech length weighting],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [],
+      ), [F0 RMSE], [Accuracy of pitch prediction],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [],
+      ), [DUR MAD], [Accuracy of phoneme duration prediction],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [],
+      ), [WER], [Speech recognition accuracy/intelligibility],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [],
+      ), [CV (dur/f0)], [Diversity assessment through duration and pitch variation],
+      [], [RTF], [Speed of synthesis relative to real-time],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [Voicebox],
+      ), [WER], [Speech correctness and intelligibility measurement],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [@le2023voiceboxtextguidedmultilingualuniversal],
+      ), [QMOS], [Subjective audio quality assessment],
+      table.cell(stroke: (bottom: 0pt), []), [SMOS], [Speaker and style similarity evaluation],
+      table.cell(stroke: (bottom: 0pt), []), [MS-MAE/MS-Corr], [Phoneme duration prediction accuracy and correlation],
+      table.cell(stroke: (bottom: 0pt), []), [FDD/FSD], [Quality and diversity assessment of duration/speech samples],
+      [], [SIM-r/SIM-o], [Audio similarity evaluation using WavLM-TDCNN],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [NaturalSpeech 3],
+      ), [SIM-O/SIM-R], [Speaker similarity assessment with original/reconstructed prompts],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [@ju2024naturalspeech3zeroshotspeech],
+      ), [UTMOS], [Objective substitute for MOS evaluation],
+      table.cell(stroke: (bottom: 0pt), []), [WER], [Speech intelligibility measurement],
+      table.cell(stroke: (bottom: 0pt), []), [MCD & MCD-Acc], [Prosodic similarity and emotion accuracy assessment],
+      table.cell(stroke: (bottom: 0pt), []), [CMOS/SMOS], [Comparative naturalness and similarity evaluation],
+      table.cell(stroke: (bottom: 0pt), []), [PESQ/STOI], [Perceptual quality and intelligibility measurement],
+      [], [MSTFT], [Spectral distance measurement],
+      table.cell(stroke: (bottom: 0pt), [CLaM TTS]), [CER/WER], [Character and word-level transcription accuracy],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [@kim2024clamttsimprovingneuralcodec],
+      ), [SIM-o/SIM-r], [Speaker similarity using WavLM-TDCNN embeddings],
+      table.cell(stroke: (bottom: 0pt), []), [QMOS/SMOS], [Quality and similarity assessment],
+      table.cell(stroke: (bottom: 0pt), []), [CMOS], [Comparative quality evaluation],
+      [], [PESQ/ViSQOL], [Objective speech quality metrics],
+      table.cell(stroke: (bottom: 0pt), [XTTS]), [CER], [Pronunciation accuracy assessment],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [@casanova2024xttsmassivelymultilingualzeroshot],
+      ), [UTMOS], [Predicted naturalness score],
+      table.cell(stroke: (bottom: 0pt), []), [SECS], [Speaker similarity using ECAPA2 embeddings],
+      [], [CMOS/SMOS], [Comparative naturalness and speaker similarity evaluation],
+      table.cell(stroke: (bottom: 0pt), [BASE TTS]), [MUSHRA], [Quality comparison on 0-100 scale],
+      table.cell(
+        stroke: (bottom: 0pt),
+        [@łajszczak2024basettslessonsbuilding],
+      ), [Expert Evaluation], [Assessment of handling complex linguistic features],
+      table.cell(stroke: (bottom: 0pt), []), [WER], [Speech intelligibility measurement],
+      [], [SIM], [Speaker similarity evaluation],
+    )
+  ],
+)
