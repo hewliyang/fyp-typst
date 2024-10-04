@@ -20,10 +20,6 @@
 
 #newPage()
 
-#include "summary.typ"
-
-#newPage()
-
 #include "abstract.typ"
 
 #newPage()

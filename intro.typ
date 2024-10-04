@@ -4,28 +4,15 @@
 
 == Terminology
 
-#{
-  set align(center)
-  box(height: 32pt, width: 100%, rect([TODO]))
-}
-- Phoneme
-- Spectrogram
-- Prosody
-- Timbre
-- Tokens
-- ASR
-- TTS
-- WER
-- CER
-- MSE
-- MAE
-- Sampling Frequency $f_s$
-- dB - decibels
-- FFT
-- STFT
-- CNN
-- Vocoder
-- Codec
+- Phoneme: The smallest unit of sound in a language that can distinguish one word from another. For example, the words "bat" and "pat" differ by one phoneme.
+- Spectrogram: A visual representation of the spectrum of frequencies in a sound signal as they vary over time, often used in analyzing speech and audio signals.
+- Prosody: The patterns of rhythm, stress, and intonation in speech, which contribute to the emotional and contextual meaning.
+- Timbre: The quality or color of a sound that makes it distinguishable from others, even if they have the same pitch and loudness. It is often what helps us recognize different instruments or voices.
+- Tokens: In natural language processing, tokens are the smallest units of text (like words or subwords) that a model uses for processing.
+- FFT: An algorithm that efficiently computes the Fourier transform, converting a signal from the time domain to the frequency domain.
+- STFT: A Fourier-related transform used to determine the sinusoidal frequency and phase content of local sections of a signal as it changes over time.
+- Vocoder: A technology used in speech synthesis and audio processing that converts between a representation of speech and an audio signal, often by separating the vocal signal into features like pitch and timbre.
+- Codec: A device or program that compresses and decompresses digital audio data, used to reduce the file size or transmit audio data efficiently.
 
 == Text to Speech
 
