@@ -1,6 +1,6 @@
 #set heading(numbering: "1.")
 
-= Dataset Curation
+= Dataset Curation <sec-dataset-curation>
 
 In this section, we aim to reproduce the NISQA train set, including the latest Blizzard Challenges 2020, 2021 and 2023. In addition, each stimulus is tagged with an additional boolean field denoting whether the original authors allow commercial use of the data or is restricted to non-commercial purposes such as academic reasearch only.
 
