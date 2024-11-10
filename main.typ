@@ -61,3 +61,7 @@
 #newPage()
 
 #outline(title: "Images", target: figure.where(kind: image))
+
+#newPage()
+
+#include "appendix.typ"

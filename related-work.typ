@@ -96,10 +96,11 @@ Evaluations show that MOSNet performs remarkably at the system-level with a PRCC
 
 The authors claim that the model generalizes to unseen data by providing evidence that testing on the VCC 2016 dataset, a PRCC of 0.917 was obtained at the system-level.
 
-== NISQA
+== NISQA <section-nisqa>
 
 NISQA for assessing synthetic speech MOS the work of @Mittag_2020, and is not be confused with their later work under the same name @Mittag_2021. Like MOSNet, NISQA also utilizes a CNN-BiLSTM framework but later in @Mittag_2021 introduces a self-attention architecture, replacing the BiLSTM module to better capture temporal interactions.
 
+NISQA was initially used for predicting MOS scores in the telecommunications field, particularly to evaluate and detect degradations in signal quality post-transmission. Due to architectural similarities with MOSNet, the authors also found it to be suitable for neural speech applications.
 
 In contrast to MOSNet, NISQA utilises mel spectrograms instead of linear spectrograms. They are divided into 150ms segments with 10ms hop length which are fed into the CNN encoder. The encoder output for each segment is a 20-dimensional feature vector which is then used as input for a bidirectional LSTM or self-attention network. Each framewise prediction is then average-pooled at the final output layer.
 
@@ -127,3 +128,5 @@ In terms of results, NISQA demonstrates similar behavior to MOSNet with spectacu
 On VCC 2016 however, NISQA with transfer learning outperforms MOSNet with a system-level correlation of 0.96 compared to 0.92. The authors conduted ablations and found that the model without pre-training achieves a similar correlation of 0.93.
 
 Note that the results claimed were computed based on the earlier CNN-BiLSTM architecture.
+
+While the relatively poorer stimuli level performance on unseen data puts into question the reliability of it's predictions, in practice it is still useful to use in conjunction with other objective or subjective metrics in a multivariate evaluation system.

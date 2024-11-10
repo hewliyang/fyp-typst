@@ -11,11 +11,28 @@ We suggest that this phenomenon is due to training data bias
 
 Therefore, researchers have come up with incorporating innovative techniques such as self-supervised features to augment such MOS predictors. On the other hand, there are also alternative non-MOS metrics that can be used as a proxy for human perception. These metrics such as SpeechLMScore @maiti2022speechlmscoreevaluatingspeechgeneration can be trained in an unsupervised manner and therefore are not as heavily dependent on labeled datasets.
 
-== UTMOS
+== UTMOS <section-utmos>
 
 UTokyo-SaruLab MOS (UTMOS) @saeki2022utmosutokyosarulabvoicemoschallenge is based on ensemble learning of strong and weak learners. It was proposed in VoiceMOS 2022, and is used as a baseline system for VoiceMOS 2023.
 
 The strong learners are fined-tuned models of self-supervised learning (SSL) models based on Wav2Vec @baevski2020wav2vec20frameworkselfsupervised. UTMOS introduces tricks such as contrastive learning, listener dependency and phoneme encoding to augment SSL outputs with relevant features.
+
+=== Listener Dependency
+
+Different listeners have different perceptions of quality. A single utterance may receive varying scores from different individuals. Typically during training, such scores are averaged and then assumed to be the ground-truth during training, losing information about individual listener bias.
+
+UTMOS concatenates a learnt embedding vector for each listener during training to the frame-wise SSL features, encoding this information directly into the weights. A "mean listener" embedding is also learned, which represents the average listener preference which is used during inference on unseen data, where the listener identification is unknown or out of distribution.
+
+
+=== System Dependency
+
+Different datasets present different recording conditions, speaking styles or even languages which are additional sources of bias or confounding factors for MOS scores.
+
+Similar to listener embeddings, domain embeddings are used and a "mean domain" embedding is also learnt.
+
+=== Inference
+
+If the domain or speaker can be identified, their specific embeddings are concatenated to the SSL features. Otherwise, the learnt "mean" embeddings are used for each respectively instead.
 
 The weak learners use basic machine-learning methods i.e. linear regression & random forest to predict scores based on these SSL features.
 

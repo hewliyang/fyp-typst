@@ -1,5 +1,17 @@
 #set heading(numbering: "1.")
 #import "@preview/showybox:2.0.1": showybox
+#import "@preview/fletcher:0.5.2" as fletcher: diagram, node, edge
+#import fletcher.shapes: house, hexagon
+
+#let blob(pos, label, tint: white, ..args) = node(
+  pos,
+  align(center, label),
+  width: 60mm,
+  fill: tint.lighten(60%),
+  stroke: 1pt + tint.darken(20%),
+  corner-radius: 10pt,
+  ..args,
+)
 
 = Ablations
 
@@ -7,9 +19,52 @@ In this section, we describe retraining the NISQA architecture from scratch on n
 
 All experiments were conducted on an AWS EC2 `g4dn.xlarge` instance with 4 vCPUs, 16 GB of memory and a single Nvidia Tesla T4 with 16 GB of VRAM.
 
-== Training
+== Training <section-training>
 
 Since, the original pre-training corpus was not released in @Mittag_2020, we utilize a similar synthetic corpus described in @Mittag_2021 as the *NISQA Corpus*.
+
+The figure below illustrates the difference between the original NISQA training workflow vs our experimental setup.
+
+#figure(
+  caption: "Training workflow comparison to original NISQA paper",
+  [
+    #grid(
+      columns: (1fr, 1fr),
+      align: center,
+      diagram(
+        spacing: 15pt,
+        cell-size: (8mm, 10mm),
+        edge-stroke: 1pt,
+        edge-corner-radius: 5pt,
+        mark-scale: 70%,
+
+        blob((0, 0), [Unreleased #linebreak() Pre-Training Corpus], tint: blue, shape: hexagon),
+        edge("->"),
+        blob((0, 1), [Pre-training (BiLSTM)], tint: orange),
+        edge("->"),
+        blob((0, 2), [Fine-tuning (BiLSTM)], tint: green),
+        edge("->"),
+        blob((0, 3), [Final Model], tint: red, shape: house),
+      ),
+      diagram(
+        spacing: 15pt,
+        cell-size: (8mm, 10mm),
+        edge-stroke: 1pt,
+        edge-corner-radius: 5pt,
+        mark-scale: 70%,
+
+        blob((0, 0), [NISQA Corpus], tint: blue, shape: hexagon),
+        edge("->"),
+        blob((0, 1), [Pre-training (Self-attention)], tint: orange),
+        edge("->"),
+        blob((0, 2), [Fine-tuning (Self-attention)], tint: green),
+        edge("->"),
+        blob((0, 3), [Final Model], tint: red, shape: house),
+      ),
+    )
+  ],
+) <figure-training>
+
 
 Overall, it includes over 14,000 stimuli with a total of over 97,000 human ratings for MOS-N. But we only use a subset shown below as the other datasets mainly focused on VoIP distortions, which may be out of distribution for our use case.
 
@@ -17,7 +72,7 @@ Overall, it includes over 14,000 stimuli with a total of over 97,000 human ratin
   caption: "Subset of NISQA Corpus used in pre-training",
   kind: table,
   [
-    #set text(size: 10.5pt)
+    #set text(size: 10pt)
     #table(
       columns: 6,
       [Dataset], [Language], [Files], [Individual Speakers], [Files per Condition], [Votes per File],
